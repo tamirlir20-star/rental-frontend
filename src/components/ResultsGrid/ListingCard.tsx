@@ -1,42 +1,60 @@
 import type { Listing } from "../../types/listing";
-import { formatPrice, formatRooms, formatSize, formatFloor, formatAge } from "../../utils/format";
+import { formatRooms, formatSize, formatFloor, formatAge } from "../../utils/format";
 
 interface Props {
   listing: Listing;
   onOpen: (listing: Listing) => void;
 }
 
-const SOURCE_BADGES: Record<string, { label: string; className: string; logo?: string }> = {
-  yad2: { label: "יד2", className: "bg-red-100 text-red-700", logo: "https://www.google.com/s2/favicons?domain=yad2.co.il&sz=32" },
-  madlan: { label: "מדלן", className: "bg-purple-100 text-purple-700", logo: "https://www.google.com/s2/favicons?domain=madlan.co.il&sz=32" },
-  homeless: { label: "Homeless", className: "bg-blue-100 text-blue-700", logo: "https://www.google.com/s2/favicons?domain=homeless.co.il&sz=32" },
-  winwin: { label: "WinWin", className: "bg-green-100 text-green-700", logo: "https://www.google.com/s2/favicons?domain=winwin.co.il&sz=32" },
-  facebook_marketplace: { label: "FB Market", className: "bg-blue-900 text-white", logo: "https://www.google.com/s2/favicons?domain=facebook.com&sz=32" },
-  facebook_groups: { label: "FB קבוצה", className: "bg-blue-900 text-white", logo: "https://www.google.com/s2/favicons?domain=facebook.com&sz=32" },
+const SOURCE_CONFIG: Record<string, { label: string; color: string; bg: string; logo: string }> = {
+  yad2:                { label: "יד2",       color: "#dc2626", bg: "#fef2f2", logo: "https://www.google.com/s2/favicons?domain=yad2.co.il&sz=32" },
+  madlan:              { label: "מדלן",      color: "#7c3aed", bg: "#f5f3ff", logo: "https://www.google.com/s2/favicons?domain=madlan.co.il&sz=32" },
+  homeless:            { label: "Homeless",  color: "#2563eb", bg: "#eff6ff", logo: "https://www.google.com/s2/favicons?domain=homeless.co.il&sz=32" },
+  winwin:              { label: "WinWin",    color: "#16a34a", bg: "#f0fdf4", logo: "https://www.google.com/s2/favicons?domain=winwin.co.il&sz=32" },
+  facebook_marketplace:{ label: "FB Market", color: "#1d4ed8", bg: "#eff6ff", logo: "https://www.google.com/s2/favicons?domain=facebook.com&sz=32" },
+  facebook_groups:     { label: "FB קבוצה", color: "#1d4ed8", bg: "#eff6ff", logo: "https://www.google.com/s2/favicons?domain=facebook.com&sz=32" },
 };
 
-function AmenityIcon({ show, icon, label }: { show: boolean | null; icon: string; label: string }) {
+function AmenityPill({ show, icon, label }: { show: boolean | null; icon: string; label: string }) {
   if (!show) return null;
   return (
-    <span className="text-sm" title={label}>{icon}</span>
+    <span
+      className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium"
+      style={{ background: "#f7f5f0", color: "#57534e" }}
+      title={label}
+    >
+      <span className="text-sm">{icon}</span>
+      {label}
+    </span>
   );
 }
 
 export default function ListingCard({ listing, onOpen }: Props) {
-  const badge = SOURCE_BADGES[listing.source] ?? { label: listing.source, className: "bg-gray-100 text-gray-700" };
+  const src = SOURCE_CONFIG[listing.source] ?? { label: listing.source, color: "#78716c", bg: "#f7f5f0", logo: "" };
   const rooms = formatRooms(listing.rooms);
   const size = formatSize(listing.size_sqm);
   const floor = formatFloor(listing.floor, listing.total_floors);
   const age = formatAge(listing.first_seen);
 
+  const price = listing.price
+    ? "₪" + listing.price.toLocaleString("he-IL")
+    : "מחיר לא ידוע";
+
   return (
     <div
-      className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col"
+      className="card-lift flex flex-col cursor-pointer"
+      style={{
+        background: "#fff",
+        borderRadius: "1rem",
+        border: "1px solid #e8e4dc",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+        overflow: "hidden",
+      }}
       onClick={() => onOpen(listing)}
     >
       {/* Image */}
       {listing.image_url ? (
-        <div className="h-40 overflow-hidden rounded-t-xl bg-gray-100 flex-shrink-0">
+        <div className="relative flex-shrink-0" style={{ height: 180, background: "#f4f2ee" }}>
           <img
             src={listing.image_url}
             alt={listing.title ?? ""}
@@ -44,72 +62,87 @@ export default function ListingCard({ listing, onOpen }: Props) {
             loading="lazy"
             onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 50%)" }}
+          />
         </div>
       ) : (
-        <div className="h-32 rounded-t-xl bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center flex-shrink-0">
-          <span className="text-3xl text-gray-300">🏠</span>
+        <div className="flex items-center justify-center flex-shrink-0" style={{ height: 120, background: "linear-gradient(135deg, #f7f5f0 0%, #ede9e2 100%)" }}>
+          <span style={{ fontSize: 36, opacity: 0.4 }}>🏠</span>
         </div>
       )}
 
-      <div className="p-4 flex flex-col flex-1">
-        {/* Top row: source badge + age */}
-        <div className="flex items-center justify-between mb-2">
-          <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${badge.className}`}>
-            {badge.logo && (
+      <div className="flex flex-col flex-1 p-4">
+        {/* Source badge + age */}
+        <div className="flex items-center justify-between mb-3">
+          <span
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-bold"
+            style={{ background: src.bg, color: src.color }}
+          >
+            {src.logo && (
               <img
-                src={badge.logo}
-                alt={badge.label}
-                className="w-4 h-4 rounded-sm"
+                src={src.logo}
+                alt={src.label}
+                className="rounded-sm"
+                style={{ width: 14, height: 14 }}
                 onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               />
             )}
-            {badge.label}
+            {src.label}
           </span>
-          <span className="text-xs text-gray-400">{age}</span>
+          <span className="text-xs" style={{ color: "#c8c3bb" }}>{age}</span>
         </div>
 
         {/* Price */}
-        <div className="mb-1">
-          <span className="text-2xl font-bold text-[#0D1B2A]">
-            {formatPrice(listing.price)}
+        <div className="mb-2">
+          <span className="text-2xl font-black leading-none" style={{ color: "#1c1917" }}>
+            {price}
           </span>
-          <span className="text-xs text-gray-400 mr-1">/חודש</span>
+          <span className="text-xs mr-1" style={{ color: "#a8a29e" }}>/חודש</span>
         </div>
 
         {/* Rooms + size */}
         {(rooms || size) && (
-          <p className="text-sm text-gray-600 mb-1">
+          <p className="text-sm font-semibold mb-1.5" style={{ color: "#44403c" }}>
             {[rooms, size].filter(Boolean).join(" · ")}
           </p>
         )}
 
         {/* Location */}
-        <p className="text-sm text-gray-500 mb-1">
-          {[listing.neighborhood, listing.city].filter(Boolean).join(", ") || "מיקום לא ידוע"}
+        <p className="text-sm mb-1" style={{ color: "#78716c" }}>
+          📍 {[listing.neighborhood, listing.city].filter(Boolean).join(", ") || "מיקום לא ידוע"}
         </p>
 
         {/* Floor */}
         {floor && (
-          <p className="text-xs text-gray-400 mb-2">{floor}</p>
+          <p className="text-xs mb-3" style={{ color: "#a8a29e" }}>{floor}</p>
         )}
 
         {/* Amenities */}
-        <div className="flex items-center gap-2 mb-3">
-          <AmenityIcon show={listing.has_parking} icon="🅿" label="חניה" />
-          <AmenityIcon show={listing.has_balcony} icon="🌿" label="מרפסת" />
-          <AmenityIcon show={listing.has_elevator} icon="🛗" label="מעלית" />
-          <AmenityIcon show={listing.pets_allowed} icon="🐾" label="חיות מחמד" />
+        <div className="flex flex-wrap gap-1.5 mb-3">
+          <AmenityPill show={listing.has_parking} icon="🅿" label="חניה" />
+          <AmenityPill show={listing.has_balcony} icon="🌿" label="מרפסת" />
+          <AmenityPill show={listing.has_elevator} icon="🛗" label="מעלית" />
+          <AmenityPill show={listing.pets_allowed} icon="🐾" label="חיות מחמד" />
           {listing.furnished && (
-            <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium">מרוהטת</span>
+            <span
+              className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium"
+              style={{ background: "#fef3c7", color: "#92400e" }}
+            >
+              🛋 מרוהטת
+            </span>
           )}
         </div>
 
         {/* Price per sqm */}
         {listing.price_per_sqm && (
-          <p className="text-xs text-gray-400 mb-3">₪{listing.price_per_sqm} למ"ר</p>
+          <p className="text-xs mb-3" style={{ color: "#c8c3bb" }}>
+            ₪{listing.price_per_sqm.toLocaleString("he-IL")} למ״ר
+          </p>
         )}
 
-        {/* Action button */}
+        {/* CTA */}
         <div className="mt-auto">
           {listing.url ? (
             <a
@@ -117,14 +150,18 @@ export default function ListingCard({ listing, onOpen }: Props) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
-              className="block w-full text-center bg-amber-400 hover:bg-amber-500 text-white text-sm font-semibold py-2 rounded-lg transition-colors"
+              className="block w-full text-center text-sm font-bold py-2.5 rounded-xl transition-all"
+              style={{ background: "#0f172a", color: "#fff" }}
+              onMouseEnter={e => (e.currentTarget.style.background = "#1e293b")}
+              onMouseLeave={e => (e.currentTarget.style.background = "#0f172a")}
             >
-              ראה מודעה ↗
+              צפה במודעה ↗
             </a>
           ) : (
             <button
-              className="w-full bg-gray-100 text-gray-500 text-sm py-2 rounded-lg cursor-default"
               disabled
+              className="w-full text-sm py-2.5 rounded-xl cursor-default"
+              style={{ background: "#f7f5f0", color: "#c8c3bb", border: "1px solid #e8e4dc" }}
             >
               אין קישור
             </button>

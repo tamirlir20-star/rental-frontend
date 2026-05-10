@@ -12,19 +12,20 @@ export default function AmenitiesFilter() {
 
   return (
     <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-1.5">נוחיות</label>
-      <div className="flex flex-wrap gap-2">
+      <label className="block text-xs font-bold uppercase tracking-wider mb-2.5" style={{ color: "#a8a29e" }}>נוחיות</label>
+      <div className="flex flex-wrap gap-1.5">
         {AMENITIES.map(({ key, label, icon }) => {
           const active = store[key] === true;
           return (
             <button
               key={key}
               onClick={() => store.toggleBool(key)}
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              style={
                 active
-                  ? "bg-[#0D1B2A] border-[#0D1B2A] text-white"
-                  : "bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-400"
-              }`}
+                  ? { background: "#0f172a", color: "#fff", border: "1.5px solid #0f172a" }
+                  : { background: "#f7f5f0", color: "#57534e", border: "1.5px solid #e8e4dc" }
+              }
             >
               <span>{icon}</span>
               <span>{label}</span>

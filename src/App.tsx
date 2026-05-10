@@ -9,9 +9,9 @@ import RentChart from "./components/RentChart";
 const RentMap = lazy(() => import("./components/RentMap"));
 
 const TABS = [
-  { key: "listings", label: "מודעות" },
-  { key: "charts", label: "גרפים" },
-  { key: "map", label: "מפה" },
+  { key: "listings", label: "מודעות", icon: "🏠" },
+  { key: "charts", label: "גרפים", icon: "📊" },
+  { key: "map", label: "מפה", icon: "🗺️" },
 ] as const;
 
 type Tab = (typeof TABS)[number]["key"];
@@ -23,12 +23,10 @@ function readTabFromUrl(): Tab {
 
 function MapFallback() {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm" style={{ height: 540 }}>
-      <div className="flex items-center justify-center h-full text-gray-400">
-        <div className="text-center">
-          <div className="text-4xl mb-2">🗺️</div>
-          <p>טוען מפה...</p>
-        </div>
+    <div className="rounded-2xl border flex items-center justify-center" style={{ height: 540, background: "#fff", borderColor: "#e8e4dc" }}>
+      <div className="text-center">
+        <div className="text-4xl mb-3">🗺️</div>
+        <p style={{ color: "#a8a29e" }}>טוען מפה...</p>
       </div>
     </div>
   );
@@ -55,23 +53,25 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ background: "#f4f2ee" }}>
       <Header />
 
       {/* Tab bar */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex">
+      <div className="sticky top-0 z-10" style={{ background: "#fff", borderBottom: "1px solid #e8e4dc", boxShadow: "0 1px 8px rgba(0,0,0,0.06)" }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-center gap-1 py-2">
             {TABS.map(tab => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`px-5 py-3.5 text-sm font-semibold border-b-2 transition-all ${
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+                style={
                   activeTab === tab.key
-                    ? "border-amber-400 text-amber-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700"
-                }`}
+                    ? { background: "#0f172a", color: "#fff" }
+                    : { color: "#78716c", background: "transparent" }
+                }
               >
+                <span className="text-base">{tab.icon}</span>
                 {tab.label}
               </button>
             ))}
@@ -82,7 +82,7 @@ export default function App() {
       {/* Main content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
         {activeTab === "listings" && (
-          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[288px_1fr] gap-6">
             <FilterPanel />
             <div>
               <StatsBar />
@@ -92,7 +92,7 @@ export default function App() {
         )}
 
         {activeTab === "charts" && (
-          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[288px_1fr] gap-6">
             <FilterPanel />
             <RentChart />
           </div>
@@ -105,10 +105,10 @@ export default function App() {
         )}
       </main>
 
-      <footer className="border-t border-gray-200 bg-white mt-8">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <p className="text-xs text-gray-400">נתונים ממקורות חיים | מתעדכן בזמן אמת</p>
-          <p className="text-xs text-gray-400">מחירון שכירות ישראל &copy; 2025</p>
+      <footer style={{ borderTop: "1px solid #e8e4dc", background: "#fff", marginTop: "2rem" }}>
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <p className="text-xs" style={{ color: "#a8a29e" }}>נתונים ממקורות חיים | מתעדכן בזמן אמת</p>
+          <p className="text-xs" style={{ color: "#a8a29e" }}>מחירון שכירות ישראל &copy; 2025</p>
         </div>
       </footer>
     </div>

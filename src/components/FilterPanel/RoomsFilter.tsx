@@ -5,24 +5,13 @@ export default function RoomsFilter() {
   const { roomsMin, roomsMax, setRoomsMin, setRoomsMax } = useFilterStore();
 
   const toggle = (value: number) => {
-    const isMax = value === 4; // 4+ means roomsMin=4, no max
+    const isMax = value === 4;
     if (isMax) {
-      if (roomsMin === 4) {
-        setRoomsMin(null);
-        setRoomsMax(null);
-      } else {
-        setRoomsMin(4);
-        setRoomsMax(null);
-      }
+      if (roomsMin === 4) { setRoomsMin(null); setRoomsMax(null); }
+      else { setRoomsMin(4); setRoomsMax(null); }
     } else {
-      // Single room selection: set both min and max
-      if (roomsMin === value && roomsMax === value) {
-        setRoomsMin(null);
-        setRoomsMax(null);
-      } else {
-        setRoomsMin(value);
-        setRoomsMax(value);
-      }
+      if (roomsMin === value && roomsMax === value) { setRoomsMin(null); setRoomsMax(null); }
+      else { setRoomsMin(value); setRoomsMax(value); }
     }
   };
 
@@ -33,17 +22,18 @@ export default function RoomsFilter() {
 
   return (
     <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-1.5">חדרים</label>
+      <label className="block text-xs font-bold uppercase tracking-wider mb-2.5" style={{ color: "#a8a29e" }}>חדרים</label>
       <div className="flex flex-wrap gap-1.5">
         {ROOM_OPTIONS.map(opt => (
           <button
             key={opt.value}
             onClick={() => toggle(opt.value)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+            style={
               isActive(opt.value)
-                ? "bg-[#0D1B2A] border-[#0D1B2A] text-white"
-                : "bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-400"
-            }`}
+                ? { background: "#0f172a", color: "#fff", border: "1.5px solid #0f172a" }
+                : { background: "#f7f5f0", color: "#57534e", border: "1.5px solid #e8e4dc" }
+            }
           >
             {opt.label}
           </button>

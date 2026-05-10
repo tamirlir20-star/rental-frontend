@@ -2,13 +2,15 @@
 
 @layer base {
   * {
-    font-family: 'Segoe UI', 'Arial Hebrew', Arial, sans-serif;
+    font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
     box-sizing: border-box;
   }
   body {
     direction: rtl;
-    background-color: #f8fafc;
+    background-color: #f4f2ee;
     margin: 0;
+    color: #1c1917;
+    -webkit-font-smoothing: antialiased;
   }
   #root {
     min-height: 100vh;
@@ -16,12 +18,47 @@
   }
 }
 
-/* Leaflet map override */
-.leaflet-container {
-  border-radius: 0.75rem;
-}
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f4f2ee; }
+::-webkit-scrollbar-thumb { background: #c8c3bb; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
 
-/* RTL range slider */
+/* Leaflet map */
+.leaflet-container { border-radius: 1rem; }
+
+/* Range sliders */
 input[type="range"] {
   direction: ltr;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #e5e2db;
+  border-radius: 2px;
+  outline: none;
+  width: 100%;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0f172a;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  transition: transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Card hover lift */
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
 }

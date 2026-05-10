@@ -18,21 +18,21 @@ export default function SortBar({ total, isRefreshing }: Props) {
 
   return (
     <div className="flex items-center justify-between mb-4">
+      <p className="text-sm font-medium" style={{ color: "#78716c" }}>
+        {isRefreshing ? (
+          <span style={{ color: "#f59e0b" }}>מתעדכן...</span>
+        ) : (
+          <><strong style={{ color: "#1c1917", fontWeight: 700 }}>{total.toLocaleString("he-IL")}</strong> תוצאות</>
+        )}
+      </p>
+
       <div className="flex items-center gap-2">
-        <p className="text-sm text-gray-500">
-          {isRefreshing ? (
-            <span className="text-amber-600 font-medium">מתעדכן...</span>
-          ) : (
-            <span><strong className="text-gray-800">{total.toLocaleString("he-IL")}</strong> מודעות</span>
-          )}
-        </p>
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-500">מיון:</span>
+        <span className="text-xs" style={{ color: "#a8a29e" }}>מיון:</span>
         <select
           value={sortBy}
           onChange={e => setSortBy(e.target.value as FilterState["sortBy"])}
-          className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-amber-400"
+          className="text-sm font-medium px-3 py-1.5 rounded-lg outline-none cursor-pointer"
+          style={{ background: "#fff", border: "1px solid #e8e4dc", color: "#1c1917" }}
         >
           {SORTS.map(s => (
             <option key={s.value} value={s.value}>{s.label}</option>
@@ -40,7 +40,8 @@ export default function SortBar({ total, isRefreshing }: Props) {
         </select>
         <button
           onClick={() => setSortDir(sortDir === "asc" ? "desc" : "asc")}
-          className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm bg-white hover:bg-gray-50 transition-colors"
+          className="px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+          style={{ background: "#fff", border: "1px solid #e8e4dc", color: "#57534e" }}
           title={sortDir === "asc" ? "עולה" : "יורד"}
         >
           {sortDir === "asc" ? "↑" : "↓"}
