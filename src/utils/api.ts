@@ -1,6 +1,6 @@
 import type { ListingsResponse, CityOption, NeighborhoodOption } from "../types/listing";
 
-const BASE = "http://localhost:8000";
+const BASE = import.meta.env.VITE_API_URL ?? "https://israeli-rental-api.onrender.com";
 
 export class ApiError extends Error {
   status: number;
