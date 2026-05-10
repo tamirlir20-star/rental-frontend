@@ -6,13 +6,13 @@ interface Props {
   onOpen: (listing: Listing) => void;
 }
 
-const SOURCE_BADGES: Record<string, { label: string; className: string }> = {
-  yad2: { label: "יד2", className: "bg-red-100 text-red-700" },
-  madlan: { label: "מדלן", className: "bg-purple-100 text-purple-700" },
-  homeless: { label: "Homeless", className: "bg-blue-100 text-blue-700" },
-  winwin: { label: "WinWin", className: "bg-green-100 text-green-700" },
-  facebook_marketplace: { label: "FB Market", className: "bg-blue-900 text-white" },
-  facebook_groups: { label: "FB קבוצה", className: "bg-blue-900 text-white" },
+const SOURCE_BADGES: Record<string, { label: string; className: string; logo?: string }> = {
+  yad2: { label: "יד2", className: "bg-red-100 text-red-700", logo: "https://www.google.com/s2/favicons?domain=yad2.co.il&sz=32" },
+  madlan: { label: "מדלן", className: "bg-purple-100 text-purple-700", logo: "https://www.google.com/s2/favicons?domain=madlan.co.il&sz=32" },
+  homeless: { label: "Homeless", className: "bg-blue-100 text-blue-700", logo: "https://www.google.com/s2/favicons?domain=homeless.co.il&sz=32" },
+  winwin: { label: "WinWin", className: "bg-green-100 text-green-700", logo: "https://www.google.com/s2/favicons?domain=winwin.co.il&sz=32" },
+  facebook_marketplace: { label: "FB Market", className: "bg-blue-900 text-white", logo: "https://www.google.com/s2/favicons?domain=facebook.com&sz=32" },
+  facebook_groups: { label: "FB קבוצה", className: "bg-blue-900 text-white", logo: "https://www.google.com/s2/favicons?domain=facebook.com&sz=32" },
 };
 
 function AmenityIcon({ show, icon, label }: { show: boolean | null; icon: string; label: string }) {
@@ -54,7 +54,15 @@ export default function ListingCard({ listing, onOpen }: Props) {
       <div className="p-4 flex flex-col flex-1">
         {/* Top row: source badge + age */}
         <div className="flex items-center justify-between mb-2">
-          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge.className}`}>
+          <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${badge.className}`}>
+            {badge.logo && (
+              <img
+                src={badge.logo}
+                alt={badge.label}
+                className="w-4 h-4 rounded-sm"
+                onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+              />
+            )}
             {badge.label}
           </span>
           <span className="text-xs text-gray-400">{age}</span>
