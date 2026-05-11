@@ -32,7 +32,7 @@ export function useListings(filters: FilterState) {
       has_balcony: filters.hasBalcony,
       pets_allowed: filters.petsAllowed,
       furnished: filters.furnished,
-      source: filters.sources.length === 1 ? filters.sources[0] : undefined,
+      source: filters.sources.length > 0 ? filters.sources.join(",") : undefined,
       sort_by: filters.sortBy,
       sort_dir: filters.sortDir,
       page: filters.page,
