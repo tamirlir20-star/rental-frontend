@@ -8,43 +8,99 @@ interface Props {
 
 const SORTS: { value: FilterState["sortBy"]; label: string }[] = [
   { value: "first_seen", label: "חדש ביותר" },
-  { value: "price", label: "מחיר" },
-  { value: "rooms", label: "חדרים" },
-  { value: "size_sqm", label: "שטח" },
+  { value: "price",      label: "מחיר" },
+  { value: "rooms",      label: "חדרים" },
+  { value: "size_sqm",   label: "שטח" },
 ];
 
 export default function SortBar({ total, isRefreshing }: Props) {
   const { sortBy, sortDir, setSortBy, setSortDir } = useFilterStore();
 
   return (
-    <div className="flex items-center justify-between mb-4">
-      <p className="text-sm font-medium" style={{ color: "#78716c" }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: "0.85rem",
+      }}
+    >
+      {/* Result count */}
+      <p style={{ fontSize: "0.82rem", color: "#484F58" }}>
         {isRefreshing ? (
-          <span style={{ color: "#f59e0b" }}>מתעדכן...</span>
+          <span className="glow-pulse" style={{ color: "#F59E0B", fontWeight: 600 }}>
+            מתעדכן...
+          </span>
         ) : (
-          <><strong style={{ color: "#1c1917", fontWeight: 700 }}>{total.toLocaleString("he-IL")}</strong> תוצאות</>
+          <>
+            <strong style={{ color: "#E6EDF3", fontWeight: 800, fontSize: "0.9rem" }}>
+              {total.toLocaleString("he-IL")}
+            </strong>
+            {" "}תוצאות
+          </>
         )}
       </p>
 
-      <div className="flex items-center gap-2">
-        <span className="text-xs" style={{ color: "#a8a29e" }}>מיון:</span>
+      {/* Sort controls */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+        <span style={{ fontSize: "0.72rem", color: "#30363D" }}>מיון:</span>
+
         <select
           value={sortBy}
           onChange={e => setSortBy(e.target.value as FilterState["sortBy"])}
-          className="text-sm font-medium px-3 py-1.5 rounded-lg outline-none cursor-pointer"
-          style={{ background: "#fff", border: "1px solid #e8e4dc", color: "#1c1917" }}
+          style={{
+            background: "#161B22",
+            border: "1px solid #30363D",
+            borderRadius: "0.35rem",
+            padding: "0.3rem 0.6rem",
+            fontSize: "0.78rem",
+            fontWeight: 600,
+            color: "#8B949E",
+            outline: "none",
+            cursor: "pointer",
+          }}
         >
           {SORTS.map(s => (
             <option key={s.value} value={s.value}>{s.label}</option>
           ))}
         </select>
+
         <button
           onClick={() => setSortDir(sortDir === "asc" ? "desc" : "asc")}
-          className="px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
-          style={{ background: "#fff", border: "1px solid #e8e4dc", color: "#57534e" }}
           title={sortDir === "asc" ? "עולה" : "יורד"}
+          style={{
+            width: 32,
+            height: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#161B22",
+            border: "1px solid #30363D",
+            borderRadius: "0.35rem",
+            cursor: "pointer",
+            color: "#8B949E",
+            transition: "border-color 0.15s, color 0.15s",
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "#484F58";
+            (e.currentTarget as HTMLButtonElement).style.color = "#E6EDF3";
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "#30363D";
+            (e.currentTarget as HTMLButtonElement).style.color = "#8B949E";
+          }}
         >
-          {sortDir === "asc" ? "↑" : "↓"}
+          {sortDir === "asc" ? (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="12" y1="19" x2="12" y2="5" />
+              <polyline points="5 12 12 5 19 12" />
+            </svg>
+          ) : (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <polyline points="19 12 12 19 5 12" />
+            </svg>
+          )}
         </button>
       </div>
     </div>

@@ -22,22 +22,43 @@ export default function RoomsFilter() {
 
   return (
     <div>
-      <label className="block text-xs font-bold uppercase tracking-wider mb-2.5" style={{ color: "#a8a29e" }}>חדרים</label>
-      <div className="flex flex-wrap gap-1.5">
-        {ROOM_OPTIONS.map(opt => (
-          <button
-            key={opt.value}
-            onClick={() => toggle(opt.value)}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-            style={
-              isActive(opt.value)
-                ? { background: "#0f172a", color: "#fff", border: "1.5px solid #0f172a" }
-                : { background: "#f7f5f0", color: "#57534e", border: "1.5px solid #e8e4dc" }
-            }
-          >
-            {opt.label}
-          </button>
-        ))}
+      <label
+        style={{
+          display: "block",
+          fontSize: "0.7rem",
+          fontWeight: 700,
+          color: "#484F58",
+          textTransform: "uppercase",
+          letterSpacing: "0.06em",
+          marginBottom: "0.55rem",
+        }}
+      >
+        חדרים
+      </label>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.35rem" }}>
+        {ROOM_OPTIONS.map(opt => {
+          const active = isActive(opt.value);
+          return (
+            <button
+              key={opt.value}
+              onClick={() => toggle(opt.value)}
+              className={active ? "filter-active" : ""}
+              style={{
+                padding: "0.3rem 0.65rem",
+                borderRadius: "0.35rem",
+                fontSize: "0.78rem",
+                fontWeight: active ? 700 : 500,
+                cursor: "pointer",
+                transition: "all 0.15s",
+                background: active ? "#F59E0B" : "#21262D",
+                color: active ? "#0E1117" : "#8B949E",
+                border: active ? "1px solid #F59E0B" : "1px solid #30363D",
+              }}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

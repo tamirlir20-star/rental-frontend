@@ -12,28 +12,48 @@ export default function FilterPanel() {
 
   return (
     <aside
-      className="flex flex-col gap-0 sticky h-fit"
+      className="sticky h-fit"
       style={{
-        background: "#fff",
-        borderRadius: "1rem",
-        border: "1px solid #e8e4dc",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-        top: "4rem",
+        background: "#161B22",
+        borderRadius: "0.75rem",
+        border: "1px solid #21262D",
+        top: "3.5rem",
         overflow: "hidden",
       }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid #f0ede7" }}>
+      {/* Panel header */}
+      <div
+        className="flex items-center justify-between px-4 py-3"
+        style={{ borderBottom: "1px solid #21262D" }}
+      >
         <div className="flex items-center gap-2">
-          <span className="text-base">🔍</span>
-          <h2 className="text-sm font-bold" style={{ color: "#1c1917" }}>סינון</h2>
+          <svg
+            width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="#484F58" strokeWidth="2" strokeLinecap="round"
+          >
+            <line x1="4" y1="6" x2="20" y2="6" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+            <line x1="11" y1="18" x2="13" y2="18" />
+          </svg>
+          <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#8B949E", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+            סינון
+          </span>
         </div>
         <button
           onClick={reset}
-          className="text-xs font-semibold px-3 py-1 rounded-lg transition-colors"
-          style={{ color: "#78716c", background: "#f7f5f0" }}
-          onMouseEnter={e => (e.currentTarget.style.background = "#f0ede7")}
-          onMouseLeave={e => (e.currentTarget.style.background = "#f7f5f0")}
+          style={{
+            fontSize: "0.72rem",
+            fontWeight: 600,
+            color: "#484F58",
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            padding: "0.2rem 0.5rem",
+            borderRadius: "0.25rem",
+            transition: "color 0.15s",
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = "#F59E0B")}
+          onMouseLeave={e => (e.currentTarget.style.color = "#484F58")}
         >
           נקה הכל
         </button>
@@ -55,8 +75,8 @@ export default function FilterPanel() {
 function Section({ children, last }: { children: ReactNode; last?: boolean }) {
   return (
     <div
-      className="px-5 py-4"
-      style={last ? {} : { borderBottom: "1px solid #f0ede7" }}
+      className="px-4 py-4"
+      style={last ? {} : { borderBottom: "1px solid #21262D" }}
     >
       {children}
     </div>

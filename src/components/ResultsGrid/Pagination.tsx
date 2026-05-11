@@ -24,28 +24,64 @@ export default function Pagination({ page, pages }: Props) {
     return items;
   };
 
+  const btnBase: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: "0.4rem",
+    fontSize: "0.8rem",
+    fontWeight: 600,
+    cursor: "pointer",
+    border: "1px solid #30363D",
+    background: "#161B22",
+    color: "#8B949E",
+    transition: "all 0.15s",
+    height: 34,
+  };
+
   return (
-    <div className="flex items-center justify-center gap-1.5 mt-6">
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "0.3rem",
+        marginTop: "1.5rem",
+      }}
+    >
       <button
         onClick={() => setPage(page - 1)}
         disabled={page === 1}
-        className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm disabled:opacity-40 hover:bg-gray-50 transition-colors"
+        style={{
+          ...btnBase,
+          padding: "0 0.75rem",
+          opacity: page === 1 ? 0.3 : 1,
+          cursor: page === 1 ? "not-allowed" : "pointer",
+        }}
       >
         הקודם
       </button>
 
       {getPages().map((p, i) =>
         p === "…" ? (
-          <span key={`ellipsis-${i}`} className="px-2 text-gray-400 text-sm">…</span>
+          <span
+            key={`ellipsis-${i}`}
+            style={{ padding: "0 0.3rem", color: "#30363D", fontSize: "0.8rem" }}
+          >
+            …
+          </span>
         ) : (
           <button
             key={p}
             onClick={() => setPage(p as number)}
-            className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
-              p === page
-                ? "bg-[#0D1B2A] text-white"
-                : "border border-gray-200 hover:bg-gray-50 text-gray-700"
-            }`}
+            style={{
+              ...btnBase,
+              width: 34,
+              background: p === page ? "#F59E0B" : "#161B22",
+              color: p === page ? "#0E1117" : "#8B949E",
+              border: p === page ? "1px solid #F59E0B" : "1px solid #30363D",
+              fontWeight: p === page ? 800 : 600,
+            }}
           >
             {p}
           </button>
@@ -55,7 +91,12 @@ export default function Pagination({ page, pages }: Props) {
       <button
         onClick={() => setPage(page + 1)}
         disabled={page === pages}
-        className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm disabled:opacity-40 hover:bg-gray-50 transition-colors"
+        style={{
+          ...btnBase,
+          padding: "0 0.75rem",
+          opacity: page === pages ? 0.3 : 1,
+          cursor: page === pages ? "not-allowed" : "pointer",
+        }}
       >
         הבא
       </button>

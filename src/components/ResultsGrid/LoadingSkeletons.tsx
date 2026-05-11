@@ -1,23 +1,36 @@
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 animate-pulse">
-      <div className="flex justify-between mb-3">
-        <div className="h-4 bg-gray-200 rounded w-16" />
-        <div className="h-5 bg-gray-200 rounded w-14" />
+    <div
+      className="animate-pulse"
+      style={{
+        background: "#161B22",
+        borderRadius: "0.65rem",
+        border: "1px solid #21262D",
+        overflow: "hidden",
+      }}
+    >
+      {/* Image placeholder */}
+      <div style={{ height: 168, background: "#0E1117" }} />
+
+      <div style={{ padding: "0.75rem" }}>
+        {/* Stats row */}
+        <div style={{ display: "flex", gap: "0.4rem", marginBottom: "0.55rem" }}>
+          <div style={{ height: 24, width: 72, borderRadius: 4, background: "#21262D" }} />
+          <div style={{ height: 24, width: 56, borderRadius: 4, background: "#21262D" }} />
+        </div>
+
+        {/* Location */}
+        <div style={{ height: 14, width: "65%", borderRadius: 4, background: "#21262D", marginBottom: "0.5rem" }} />
+
+        {/* Amenities */}
+        <div style={{ display: "flex", gap: "0.3rem", marginBottom: "0.65rem" }}>
+          <div style={{ width: 24, height: 24, borderRadius: 4, background: "#21262D" }} />
+          <div style={{ width: 24, height: 24, borderRadius: 4, background: "#21262D" }} />
+        </div>
+
+        {/* CTA */}
+        <div style={{ height: 34, borderRadius: "0.4rem", background: "#21262D" }} />
       </div>
-      <div className="h-7 bg-gray-200 rounded w-32 mb-1" />
-      <div className="h-3 bg-gray-100 rounded w-24 mb-3" />
-      <div className="flex gap-2 mb-3">
-        <div className="h-4 bg-gray-100 rounded w-20" />
-        <div className="h-4 bg-gray-100 rounded w-16" />
-      </div>
-      <div className="h-3 bg-gray-100 rounded w-28 mb-4" />
-      <div className="flex gap-2 mb-3">
-        {[0, 1, 2, 3].map(i => (
-          <div key={i} className="h-6 w-6 bg-gray-100 rounded-full" />
-        ))}
-      </div>
-      <div className="h-8 bg-gray-100 rounded-lg" />
     </div>
   );
 }

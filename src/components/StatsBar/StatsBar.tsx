@@ -18,11 +18,21 @@ export default function StatsBar() {
 
   if (status === "loading" || !data) {
     return (
-      <div className="grid grid-cols-3 gap-3 mb-5">
+      <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1rem" }}>
         {[1, 2, 3].map(i => (
-          <div key={i} className="rounded-xl px-4 py-3 animate-pulse" style={{ background: "#fff", border: "1px solid #e8e4dc" }}>
-            <div className="h-3 rounded mb-2" style={{ background: "#f0ede7", width: "50%" }} />
-            <div className="h-5 rounded" style={{ background: "#f0ede7", width: "70%" }} />
+          <div
+            key={i}
+            className="animate-pulse"
+            style={{
+              flex: 1,
+              background: "#161B22",
+              border: "1px solid #21262D",
+              borderRadius: "0.5rem",
+              padding: "0.75rem 1rem",
+            }}
+          >
+            <div style={{ height: 10, background: "#21262D", borderRadius: 4, width: "40%", marginBottom: 8 }} />
+            <div style={{ height: 20, background: "#21262D", borderRadius: 4, width: "65%" }} />
           </div>
         ))}
       </div>
@@ -35,25 +45,95 @@ export default function StatsBar() {
   const med = median(listings);
 
   return (
-    <div className="grid grid-cols-3 gap-3 mb-5">
-      <StatCard label="מודעות" value={data.total.toLocaleString("he-IL")} />
-      {avg && <StatCard label="ממוצע" value={fmt(avg)} accent />}
-      {med && <StatCard label="חציון" value={fmt(med)} />}
+    <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+      <StatCard
+        label="מודעות פעילות"
+        value={data.total.toLocaleString("he-IL")}
+        sub="תוצאות לסינון הנוכחי"
+        primary
+      />
+      {avg && (
+        <StatCard
+          label="מחיר ממוצע"
+          value={fmt(avg)}
+          sub="לחודש"
+        />
+      )}
+      {med && (
+        <StatCard
+          label="מחיר חציוני"
+          value={fmt(med)}
+          sub="לחודש"
+        />
+      )}
     </div>
   );
 }
 
-function StatCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function StatCard({
+  label,
+  value,
+  sub,
+  primary,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  primary?: boolean;
+}) {
   return (
     <div
-      className="rounded-xl px-4 py-3"
       style={{
-        background: accent ? "#0f172a" : "#fff",
-        border: `1px solid ${accent ? "#0f172a" : "#e8e4dc"}`,
+        flex: 1,
+        minWidth: 120,
+        background: primary ? "#1C2128" : "#161B22",
+        border: primary ? "1px solid #30363D" : "1px solid #21262D",
+        borderRadius: "0.5rem",
+        padding: "0.7rem 1rem",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      <p className="text-xs font-medium mb-0.5" style={{ color: accent ? "#94a3b8" : "#a8a29e" }}>{label}</p>
-      <p className="text-lg font-bold leading-tight" style={{ color: accent ? "#f59e0b" : "#1c1917" }}>{value}</p>
+      {/* Amber accent line on top for primary card */}
+      {primary && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            left: 0,
+            height: 2,
+            background: "linear-gradient(to left, #F59E0B, #D97706)",
+          }}
+        />
+      )}
+      <p
+        style={{
+          fontSize: "0.67rem",
+          fontWeight: 600,
+          color: "#484F58",
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+          marginBottom: "0.3rem",
+        }}
+      >
+        {label}
+      </p>
+      <p
+        style={{
+          fontSize: "1.4rem",
+          fontWeight: 900,
+          color: primary ? "#F59E0B" : "#E6EDF3",
+          lineHeight: 1,
+          letterSpacing: "-0.02em",
+          marginBottom: "0.25rem",
+        }}
+      >
+        {value}
+      </p>
+      {sub && (
+        <p style={{ fontSize: "0.67rem", color: "#30363D" }}>{sub}</p>
+      )}
     </div>
   );
 }

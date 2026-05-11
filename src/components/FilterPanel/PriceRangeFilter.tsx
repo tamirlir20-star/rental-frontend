@@ -12,42 +12,83 @@ export default function PriceRangeFilter() {
   const { priceMin, priceMax, setPriceMin, setPriceMax } = useFilterStore();
   const min = priceMin ?? MIN;
   const max = priceMax ?? MAX;
+  const hasFilter = priceMin != null || priceMax != null;
 
   return (
     <div>
-      <label className="block text-xs font-bold uppercase tracking-wider mb-2.5" style={{ color: "#a8a29e" }}>מחיר חודשי</label>
-
-      <div
-        className="flex items-center justify-between px-3 py-2 rounded-lg mb-3 text-sm font-semibold"
-        style={{ background: "#f7f5f0", color: "#1c1917" }}
-      >
-        <span>{fmt(min)}</span>
-        <span style={{ color: "#c8c3bb" }}>—</span>
-        <span>{fmt(max)}</span>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <div>
-          <p className="text-xs mb-1.5" style={{ color: "#a8a29e" }}>מינימום</p>
-          <input type="range" min={MIN} max={max - STEP} step={STEP} value={min}
-            onChange={e => setPriceMin(Number(e.target.value))} />
-        </div>
-        <div>
-          <p className="text-xs mb-1.5" style={{ color: "#a8a29e" }}>מקסימום</p>
-          <input type="range" min={min + STEP} max={MAX} step={STEP} value={max}
-            onChange={e => setPriceMax(Number(e.target.value))} />
-        </div>
-      </div>
-
-      {(priceMin || priceMax) && (
-        <button
-          onClick={() => { setPriceMin(null); setPriceMax(null); }}
-          className="text-xs mt-2 font-semibold"
-          style={{ color: "#f59e0b" }}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.55rem" }}>
+        <label
+          style={{
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            color: "#484F58",
+            textTransform: "uppercase",
+            letterSpacing: "0.06em",
+          }}
         >
-          אפס טווח
-        </button>
-      )}
+          מחיר חודשי
+        </label>
+        {hasFilter && (
+          <button
+            onClick={() => { setPriceMin(null); setPriceMax(null); }}
+            style={{
+              fontSize: "0.68rem",
+              fontWeight: 600,
+              color: "#F59E0B",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            אפס
+          </button>
+        )}
+      </div>
+
+      {/* Range display */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          background: "#0E1117",
+          border: "1px solid #30363D",
+          borderRadius: "0.4rem",
+          padding: "0.4rem 0.65rem",
+          marginBottom: "0.75rem",
+        }}
+      >
+        <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#E6EDF3" }}>{fmt(min)}</span>
+        <span style={{ fontSize: "0.75rem", color: "#30363D" }}>—</span>
+        <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#E6EDF3" }}>{fmt(max)}</span>
+      </div>
+
+      {/* Sliders */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+        <div>
+          <p style={{ fontSize: "0.68rem", color: "#484F58", marginBottom: "0.3rem" }}>מינימום</p>
+          <input
+            type="range"
+            min={MIN}
+            max={max - STEP}
+            step={STEP}
+            value={min}
+            onChange={e => setPriceMin(Number(e.target.value))}
+          />
+        </div>
+        <div>
+          <p style={{ fontSize: "0.68rem", color: "#484F58", marginBottom: "0.3rem" }}>מקסימום</p>
+          <input
+            type="range"
+            min={min + STEP}
+            max={MAX}
+            step={STEP}
+            value={max}
+            onChange={e => setPriceMax(Number(e.target.value))}
+          />
+        </div>
+      </div>
     </div>
   );
 }
