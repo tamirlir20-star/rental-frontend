@@ -81,6 +81,7 @@ export default function ListingCard({ listing, onOpen }: Props) {
             alt={listing.title ?? ""}
             loading="lazy"
             onError={() => setImgFailed(true)}
+            onLoad={e => { if ((e.currentTarget as HTMLImageElement).naturalWidth === 0) setImgFailed(true); }}
             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
           />
           {/* Gradient overlay */}
