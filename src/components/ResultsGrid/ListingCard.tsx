@@ -15,6 +15,7 @@ const SOURCE_CONFIG: Record<string, {
   yad2:                 { label: "יד2",          color: "#EF4444", logo: "https://www.google.com/s2/favicons?domain=yad2.co.il&sz=32" },
   madlan:               { label: "מדלן",         color: "#A855F7", logo: "https://www.google.com/s2/favicons?domain=madlan.co.il&sz=32" },
   homeless:             { label: "Homeless",     color: "#3B82F6", logo: "https://www.google.com/s2/favicons?domain=homeless.co.il&sz=32" },
+  onmap:                { label: "OnMap",         color: "#10B981", logo: "https://www.google.com/s2/favicons?domain=onmap.co.il&sz=32" },
   winwin:               { label: "WinWin",       color: "#22C55E", logo: "https://www.google.com/s2/favicons?domain=winwin.co.il&sz=32" },
   facebook_marketplace: { label: "FB Market",   color: "#60A5FA", logo: "https://www.google.com/s2/favicons?domain=facebook.com&sz=32" },
   facebook_groups:      { label: "FB קבוצה",    color: "#60A5FA", logo: "https://www.google.com/s2/favicons?domain=facebook.com&sz=32" },
@@ -50,14 +51,68 @@ export default function ListingCard({ listing, onOpen }: Props) {
   const size = formatSize(listing.size_sqm);
   const floor = formatFloor(listing.floor, listing.total_floors);
   const age = formatAge(listing.first_seen);
-  const [imgFailed, setImgFailed] = React.useState(false);
-  const hasImage = Boolean(listing.image_url) && !imgFailed;
+
+  // Build deduped image list; fall back to image_url if images array is empty
+  const allImages = React.useMemo(() => {
+    const imgs = (listing.images ?? []).filter(Boolean);
+    if (imgs.length === 0 && listing.image_url) return [listing.image_url];
+    return imgs;
+  }, [listing.images, listing.image_url]);
+
+  const [currentIdx, setCurrentIdx] = React.useState(0);
+  const [failedSet, setFailedSet] = React.useState<Set<number>>(() => new Set());
+  const [hovered, setHovered] = React.useState(false);
+
+  // Swipe / drag detection via pointer events
+  const pointerStartX = React.useRef(0);
+  const didSwipe = React.useRef(false);
+
+  // Advance past failed images
+  const safeIdx = React.useMemo(() => {
+    let idx = currentIdx;
+    let tries = 0;
+    while (failedSet.has(idx) && tries < allImages.length) {
+      idx = (idx + 1) % allImages.length;
+      tries++;
+    }
+    return tries >= allImages.length ? -1 : idx;
+  }, [currentIdx, failedSet, allImages.length]);
+
+  const hasImage = allImages.length > 0 && safeIdx !== -1;
+  const multipleImages = allImages.length > 1;
+
+  const navigate = (dir: 1 | -1) => {
+    setCurrentIdx(i => (i + dir + allImages.length) % allImages.length);
+  };
+
+  const markFailed = (idx: number) => {
+    setFailedSet(prev => new Set(prev).add(idx));
+  };
 
   const price = listing.price
     ? "₪" + listing.price.toLocaleString("he-IL")
     : "—";
 
   const location = [listing.neighborhood, listing.city].filter(Boolean).join(", ") || "מיקום לא ידוע";
+
+  const arrowBase: React.CSSProperties = {
+    position: "absolute",
+    top: "50%",
+    transform: "translateY(-50%)",
+    width: 28,
+    height: 28,
+    borderRadius: "50%",
+    background: "rgba(14,17,23,0.72)",
+    border: "1px solid rgba(255,255,255,0.12)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    zIndex: 3,
+    transition: "opacity 0.15s, background 0.15s",
+    opacity: hovered ? 1 : 0,
+    pointerEvents: hovered ? "auto" : "none",
+  };
 
   return (
     <div
@@ -75,14 +130,37 @@ export default function ListingCard({ listing, onOpen }: Props) {
     >
       {/* Image area */}
       {hasImage ? (
-        <div style={{ position: "relative", height: 168, background: "#0E1117", flexShrink: 0 }}>
+        <div
+          style={{ position: "relative", height: 168, background: "#0E1117", flexShrink: 0, touchAction: "pan-y" }}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          onPointerDown={multipleImages ? (e) => {
+            pointerStartX.current = e.clientX;
+            didSwipe.current = false;
+            (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+          } : undefined}
+          onPointerUp={multipleImages ? (e) => {
+            const dx = e.clientX - pointerStartX.current;
+            if (Math.abs(dx) > 40) {
+              didSwipe.current = true;
+              navigate(dx < 0 ? 1 : -1);
+            }
+          } : undefined}
+          onClick={multipleImages ? (e) => {
+            if (didSwipe.current) {
+              e.stopPropagation();
+              didSwipe.current = false;
+            }
+          } : undefined}
+        >
           <img
-            src={listing.image_url!}
+            key={safeIdx}
+            src={allImages[safeIdx]}
             alt={listing.title ?? ""}
-            loading="lazy"
-            onError={() => setImgFailed(true)}
-            onLoad={e => { if ((e.currentTarget as HTMLImageElement).naturalWidth === 0) setImgFailed(true); }}
-            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            loading={safeIdx === 0 ? "eager" : "lazy"}
+            onError={() => markFailed(safeIdx)}
+            onLoad={e => { if ((e.currentTarget as HTMLImageElement).naturalWidth === 0) markFailed(safeIdx); }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", userSelect: "none", pointerEvents: "none" }}
           />
           {/* Gradient overlay */}
           <div
@@ -90,8 +168,37 @@ export default function ListingCard({ listing, onOpen }: Props) {
               position: "absolute",
               inset: 0,
               background: "linear-gradient(to top, rgba(22,27,34,0.9) 0%, rgba(22,27,34,0.1) 55%, transparent 100%)",
+              zIndex: 1,
+              pointerEvents: "none",
             }}
           />
+          {/* Prev / Next arrows — desktop hover only */}
+          {multipleImages && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate(-1); }}
+                aria-label="Previous image"
+                style={{ ...arrowBase, left: 8 }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(14,17,23,0.92)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(14,17,23,0.72)"; }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate(1); }}
+                aria-label="Next image"
+                style={{ ...arrowBase, right: 8 }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(14,17,23,0.92)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(14,17,23,0.72)"; }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+            </>
+          )}
           {/* Source badge overlaid on image */}
           <div
             style={{
@@ -106,6 +213,7 @@ export default function ListingCard({ listing, onOpen }: Props) {
               border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: "0.35rem",
               padding: "0.2rem 0.45rem",
+              zIndex: 2,
             }}
           >
             {src.logo && (
@@ -118,8 +226,29 @@ export default function ListingCard({ listing, onOpen }: Props) {
             )}
             <span style={{ fontSize: "0.68rem", fontWeight: 700, color: src.color }}>{src.label}</span>
           </div>
+          {/* Image counter badge — bottom left, only when multiple */}
+          {multipleImages && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: "0.65rem",
+                left: "0.75rem",
+                background: "rgba(14,17,23,0.75)",
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: "0.35rem",
+                padding: "0.15rem 0.4rem",
+                fontSize: "0.65rem",
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.75)",
+                zIndex: 2,
+              }}
+            >
+              {safeIdx + 1}/{allImages.length}
+            </div>
+          )}
           {/* Price overlaid on image bottom */}
-          <div style={{ position: "absolute", bottom: "0.65rem", right: "0.75rem" }}>
+          <div style={{ position: "absolute", bottom: "0.65rem", right: "0.75rem", zIndex: 2 }}>
             <span style={{ fontSize: "1.45rem", fontWeight: 900, color: "#FFFFFF", lineHeight: 1, letterSpacing: "-0.02em" }}>
               {price}
             </span>

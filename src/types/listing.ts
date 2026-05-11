@@ -2,6 +2,7 @@ export type Source =
   | "yad2"
   | "madlan"
   | "homeless"
+  | "onmap"
   | "winwin"
   | "facebook_marketplace"
   | "facebook_groups";
