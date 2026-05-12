@@ -35,6 +35,18 @@ export interface Listing {
   first_seen: string;
   last_seen: string;
   is_active: boolean;
+  // Geo / POI
+  lat?: number | null;
+  lng?: number | null;
+  near_park?: boolean;
+  near_kindergarten?: boolean;
+  // Neighborhood / city averages (computed by API)
+  neigh_avg_price?: number | null;
+  neigh_avg_ppm?: number | null;
+  neigh_count?: number | null;
+  city_avg_price?: number | null;
+  // % cheaper (positive) or pricier (negative) than neighborhood avg
+  value_pct?: number | null;
   // API convenience aliases
   price_includes_bills?: boolean | null;
   available_from?: string | null;

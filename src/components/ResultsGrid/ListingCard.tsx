@@ -401,6 +401,64 @@ const ListingCard = React.memo(function ListingCard({ listing, onOpen }: Props) 
           <span style={{ fontSize: "0.68rem", color: "#30363D" }}>{age}</span>
         </div>
 
+        {/* Value + POI badges */}
+        {((listing.value_pct != null && listing.value_pct !== 0) || listing.near_park || listing.near_kindergarten) && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem", marginBottom: "0.55rem" }}>
+            {listing.value_pct != null && listing.value_pct >= 5 && (
+              <span
+                title={`${listing.value_pct}% זול מממוצע השכונה`}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.2rem",
+                  padding: "0.15rem 0.45rem", borderRadius: "0.3rem",
+                  background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)",
+                  fontSize: "0.65rem", fontWeight: 700, color: "#10B981",
+                }}
+              >
+                💰 {listing.value_pct}% מתחת לממוצע
+              </span>
+            )}
+            {listing.value_pct != null && listing.value_pct <= -10 && (
+              <span
+                title={`${Math.abs(listing.value_pct)}% יקר מממוצע השכונה`}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.2rem",
+                  padding: "0.15rem 0.45rem", borderRadius: "0.3rem",
+                  background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
+                  fontSize: "0.65rem", fontWeight: 700, color: "#EF4444",
+                }}
+              >
+                ↑ {Math.abs(listing.value_pct)}% מעל הממוצע
+              </span>
+            )}
+            {listing.near_park && (
+              <span
+                title="קרוב לפארק (עד 500מ׳)"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.2rem",
+                  padding: "0.15rem 0.45rem", borderRadius: "0.3rem",
+                  background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.2)",
+                  fontSize: "0.65rem", fontWeight: 700, color: "#22C55E",
+                }}
+              >
+                🌳 ליד פארק
+              </span>
+            )}
+            {listing.near_kindergarten && (
+              <span
+                title="קרוב לגן ילדים (עד 500מ׳)"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "0.2rem",
+                  padding: "0.15rem 0.45rem", borderRadius: "0.3rem",
+                  background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.2)",
+                  fontSize: "0.65rem", fontWeight: 700, color: "#60A5FA",
+                }}
+              >
+                🏫 ליד גן ילדים
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Price per sqm (if available, subtle) */}
         {listing.price_per_sqm && (
           <p style={{ fontSize: "0.68rem", color: "#30363D", marginBottom: "0.65rem" }}>
