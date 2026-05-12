@@ -6,7 +6,7 @@ import FilterDrawer from "./components/FilterPanel/FilterDrawer";
 import ResultsGrid from "./components/ResultsGrid/ResultsGrid";
 import StatsBar from "./components/StatsBar/StatsBar";
 import RentChart from "./components/RentChart";
-import WelcomeModal from "./components/WelcomeModal";
+import WelcomePage from "./components/WelcomePage";
 
 const RentMap = lazy(() => import("./components/RentMap"));
 
@@ -89,7 +89,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ background: "#0E1117" }}>
-      {showWelcome && <WelcomeModal onDone={handleWelcomeDone} />}
+      {showWelcome && <WelcomePage onDone={handleWelcomeDone} />}
       <Header />
 
       {/* Tab navigation */}
