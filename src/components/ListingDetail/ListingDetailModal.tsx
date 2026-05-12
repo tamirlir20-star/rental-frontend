@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Listing } from "../../types/listing";
 import { formatPrice, formatRooms, formatSize, formatFloor, formatAge } from "../../utils/format";
 
@@ -11,6 +11,7 @@ const SOURCE_CONFIG: Record<string, { label: string; color: string }> = {
   yad2:                 { label: "יד2",                   color: "#EF4444" },
   madlan:               { label: "מדלן",                  color: "#A855F7" },
   homeless:             { label: "Homeless",              color: "#3B82F6" },
+  onmap:                { label: "OnMap",                 color: "#10B981" },
   winwin:               { label: "WinWin",                color: "#22C55E" },
   facebook_marketplace: { label: "Facebook Marketplace",  color: "#60A5FA" },
   facebook_groups:      { label: "קבוצות Facebook",       color: "#60A5FA" },
@@ -18,6 +19,30 @@ const SOURCE_CONFIG: Record<string, { label: string; color: string }> = {
 
 export default function ListingDetailModal({ listing, onClose }: Props) {
   const src = SOURCE_CONFIG[listing.source] ?? { label: listing.source, color: "#8B949E" };
+
+  const allImages = useMemo(() => {
+    const imgs = (listing.images ?? []).filter(Boolean);
+    if (imgs.length === 0 && listing.image_url) return [listing.image_url];
+    return imgs;
+  }, [listing.images, listing.image_url]);
+
+  const [imgIdx, setImgIdx] = useState(0);
+  const [failedSet, setFailedSet] = useState<Set<number>>(() => new Set());
+  const pointerX = useRef(0);
+  const didSwipe = useRef(false);
+
+  const safeIdx = useMemo(() => {
+    let idx = imgIdx;
+    let tries = 0;
+    while (failedSet.has(idx) && tries < allImages.length) {
+      idx = (idx + 1) % allImages.length;
+      tries++;
+    }
+    return tries >= allImages.length ? -1 : idx;
+  }, [imgIdx, failedSet, allImages.length]);
+
+  const multi = allImages.length > 1;
+  const nav = (dir: 1 | -1) => setImgIdx(i => (i + dir + allImages.length) % allImages.length);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -68,29 +93,43 @@ export default function ListingDetailModal({ listing, onClose }: Props) {
         }}
         className="sm:rounded-xl sm:border-b"
       >
-        {/* Hero image */}
-        {listing.image_url && (
+        {/* Hero image carousel */}
+        {allImages.length > 0 && safeIdx !== -1 && (
           <div
-            style={{
-              height: 220,
-              background: "#161B22",
-              overflow: "hidden",
-              borderRadius: "0.75rem 0.75rem 0 0",
-              position: "relative",
-            }}
+            style={{ height: 220, background: "#161B22", overflow: "hidden", borderRadius: "0.75rem 0.75rem 0 0", position: "relative", touchAction: "pan-y" }}
+            onPointerDown={multi ? (e) => { pointerX.current = e.clientX; didSwipe.current = false; (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId); } : undefined}
+            onPointerUp={multi ? (e) => { const dx = e.clientX - pointerX.current; if (Math.abs(dx) > 40) { didSwipe.current = true; nav(dx < 0 ? 1 : -1); } } : undefined}
+            onClick={(e) => { e.stopPropagation(); if (didSwipe.current) { didSwipe.current = false; } else if (multi) { nav(1); } }}
           >
             <img
-              src={listing.image_url}
+              key={safeIdx}
+              src={allImages[safeIdx]}
               alt=""
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              onError={() => setFailedSet(p => new Set(p).add(safeIdx))}
+              style={{ width: "100%", height: "100%", objectFit: "cover", userSelect: "none", pointerEvents: "none" }}
             />
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                background: "linear-gradient(to top, rgba(14,17,23,0.8) 0%, transparent 60%)",
-              }}
-            />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(14,17,23,0.8) 0%, transparent 60%)", pointerEvents: "none" }} />
+            {multi && (
+              <>
+                <button
+                  onClick={(e) => { e.stopPropagation(); nav(-1); }}
+                  aria-label="Previous image"
+                  style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", width: 32, height: 32, borderRadius: "50%", background: "rgba(14,17,23,0.75)", border: "1px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 3 }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); nav(1); }}
+                  aria-label="Next image"
+                  style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", width: 32, height: 32, borderRadius: "50%", background: "rgba(14,17,23,0.75)", border: "1px solid rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 3 }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                </button>
+                <div style={{ position: "absolute", bottom: 10, left: 12, background: "rgba(14,17,23,0.75)", borderRadius: "0.35rem", padding: "0.15rem 0.4rem", fontSize: "0.65rem", fontWeight: 600, color: "rgba(255,255,255,0.8)", zIndex: 3 }}>
+                  {safeIdx + 1}/{allImages.length}
+                </div>
+              </>
+            )}
           </div>
         )}
 

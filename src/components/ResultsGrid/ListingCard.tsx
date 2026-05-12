@@ -146,12 +146,14 @@ export default function ListingCard({ listing, onOpen }: Props) {
               navigate(dx < 0 ? 1 : -1);
             }
           } : undefined}
-          onClick={multipleImages ? (e) => {
+          onClick={(e) => {
+            e.stopPropagation();
             if (didSwipe.current) {
-              e.stopPropagation();
               didSwipe.current = false;
+            } else if (multipleImages) {
+              navigate(1);
             }
-          } : undefined}
+          }}
         >
           <img
             key={safeIdx}
