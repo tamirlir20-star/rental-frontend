@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { fetchCities, fetchNeighborhoods } from "../utils/api";
+import { fetchNeighborhoods } from "../utils/api";
+import { getCities } from "../hooks/useCities";
 import type { CityOption, NeighborhoodOption } from "../types/listing";
 
 interface Props {
@@ -25,7 +26,7 @@ export default function WelcomePage({ onDone }: Props) {
 
   useEffect(() => {
     setTimeout(() => setMounted(true), 50);
-    fetchCities().then(setCities).catch(() => {});
+    getCities().then(setCities).catch(() => {});
   }, []);
 
   useEffect(() => {

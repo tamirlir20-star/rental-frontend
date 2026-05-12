@@ -45,7 +45,7 @@ function AmenityDot({ show, icon, label }: { show: boolean | null; icon: string;
   );
 }
 
-export default function ListingCard({ listing, onOpen }: Props) {
+const ListingCard = React.memo(function ListingCard({ listing, onOpen }: Props) {
   const src = SOURCE_CONFIG[listing.source] ?? { label: listing.source, color: "#484F58", logo: "" };
   const rooms = formatRooms(listing.rooms);
   const size = formatSize(listing.size_sqm);
@@ -497,7 +497,9 @@ export default function ListingCard({ listing, onOpen }: Props) {
       </div>
     </div>
   );
-}
+});
+
+export default ListingCard;
 
 function StatChip({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (

@@ -5,6 +5,31 @@ import type { FilterState } from "../store/filterStore";
 
 export type FetchStatus = "idle" | "loading" | "refreshing" | "success" | "error";
 
+// Module-level cache: identical param sets share one response for 60s.
+const cache = new Map<string, { data: ListingsResponse; ts: number }>();
+const CACHE_TTL = 60_000;
+
+function buildCacheKey(filters: FilterState): string {
+  return JSON.stringify({
+    city: filters.city,
+    neighborhood: filters.neighborhood,
+    roomsMin: filters.roomsMin,
+    roomsMax: filters.roomsMax,
+    priceMin: filters.priceMin,
+    priceMax: filters.priceMax,
+    sizeMin: filters.sizeMin,
+    sizeMax: filters.sizeMax,
+    hasParking: filters.hasParking,
+    hasBalcony: filters.hasBalcony,
+    petsAllowed: filters.petsAllowed,
+    furnished: filters.furnished,
+    sources: [...filters.sources].sort().join(","),
+    sortBy: filters.sortBy,
+    sortDir: filters.sortDir,
+    page: filters.page,
+  });
+}
+
 export function useListings(filters: FilterState) {
   const [data, setData] = useState<ListingsResponse | null>(null);
   const [status, setStatus] = useState<FetchStatus>("idle");
@@ -12,6 +37,14 @@ export function useListings(filters: FilterState) {
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    const key = buildCacheKey(filters);
+    const cached = cache.get(key);
+    if (cached && Date.now() - cached.ts < CACHE_TTL) {
+      setData(cached.data);
+      setStatus("success");
+      return;
+    }
+
     abortRef.current?.abort();
     const ctrl = new AbortController();
     abortRef.current = ctrl;
@@ -19,7 +52,7 @@ export function useListings(filters: FilterState) {
     setStatus(prev => (prev === "success" ? "refreshing" : "loading"));
     setError(null);
 
-    const params = {
+    fetchListings({
       city: filters.city,
       neighborhood: filters.neighborhood,
       rooms_min: filters.roomsMin,
@@ -37,11 +70,10 @@ export function useListings(filters: FilterState) {
       sort_dir: filters.sortDir,
       page: filters.page,
       page_size: 24,
-    };
-
-    fetchListings(params)
+    })
       .then(res => {
         if (!ctrl.signal.aborted) {
+          cache.set(key, { data: res, ts: Date.now() });
           setData(res);
           setStatus("success");
         }
