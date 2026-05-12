@@ -93,7 +93,7 @@ export default function ListingCard({ listing, onOpen }: Props) {
     ? "₪" + listing.price.toLocaleString("he-IL")
     : "—";
 
-  const location = [listing.neighborhood, listing.city].filter(Boolean).join(", ") || "מיקום לא ידוע";
+  const location = [listing.street, listing.neighborhood, listing.city].filter(Boolean).join(", ") || "מיקום לא ידוע";
 
   const arrowBase: React.CSSProperties = {
     position: "absolute",
@@ -373,10 +373,10 @@ export default function ListingCard({ listing, onOpen }: Props) {
           }}
         >
           <div style={{ display: "flex", gap: "0.3rem" }}>
-            <AmenityDot show={listing.has_parking}  icon="P" label="חניה" />
-            <AmenityDot show={listing.has_balcony}  icon="B" label="מרפסת" />
-            <AmenityDot show={listing.has_elevator} icon="E" label="מעלית" />
-            <AmenityDot show={listing.pets_allowed} icon="~" label="חיות מחמד" />
+            <AmenityDot show={listing.has_parking}  icon="🚗" label="חניה" />
+            <AmenityDot show={listing.has_balcony}  icon="🌿" label="מרפסת" />
+            <AmenityDot show={listing.has_elevator} icon="🛗" label="מעלית" />
+            <AmenityDot show={listing.pets_allowed} icon="🐾" label="חיות מחמד" />
             {listing.furnished && (
               <span
                 title="מרוהטת"
@@ -406,6 +406,33 @@ export default function ListingCard({ listing, onOpen }: Props) {
           <p style={{ fontSize: "0.68rem", color: "#30363D", marginBottom: "0.65rem" }}>
             ₪{listing.price_per_sqm.toLocaleString("he-IL")} למ״ר
           </p>
+        )}
+
+        {/* Phone */}
+        {listing.contact_phone && (
+          <a
+            href={`tel:${listing.contact_phone}`}
+            onClick={e => e.stopPropagation()}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.35rem",
+              width: "100%",
+              padding: "0.45rem 0",
+              borderRadius: "0.4rem",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              background: "rgba(16,185,129,0.06)",
+              color: "#10B981",
+              border: "1px solid rgba(16,185,129,0.2)",
+              textDecoration: "none",
+              marginBottom: "0.45rem",
+              direction: "ltr",
+            }}
+          >
+            📞 {listing.contact_phone}
+          </a>
         )}
 
         {/* CTA */}
