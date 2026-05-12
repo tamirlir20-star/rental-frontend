@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import FilterPanel from "./FilterPanel";
-import { useFilterStore } from "../../store/filterStore";
 
 interface Props {
   open: boolean;
