@@ -1,6 +1,6 @@
 import type { ListingsResponse, CityOption, NeighborhoodOption } from "../types/listing";
 
-const BASE = import.meta.env.VITE_API_URL ?? "https://rental-scraper-q8t.onrender.com";
+const BASE = import.meta.env.VITE_API_URL ?? "https://rental-scraper-qlol.onrender.com";
 
 export class ApiError extends Error {
   status: number;
