@@ -150,8 +150,21 @@ export default function ListingCard({ listing, onOpen }: Props) {
             e.stopPropagation();
             if (didSwipe.current) {
               didSwipe.current = false;
-            } else if (multipleImages) {
+              return;
+            }
+            if (!multipleImages) {
+              onOpen(listing);
+              return;
+            }
+            const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+            const relX = e.clientX - rect.left;
+            const third = rect.width / 3;
+            if (relX < third) {
+              navigate(-1);
+            } else if (relX > third * 2) {
               navigate(1);
+            } else {
+              onOpen(listing);
             }
           }}
         >
