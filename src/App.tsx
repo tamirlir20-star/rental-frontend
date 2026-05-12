@@ -6,6 +6,7 @@ import FilterDrawer from "./components/FilterPanel/FilterDrawer";
 import ResultsGrid from "./components/ResultsGrid/ResultsGrid";
 import StatsBar from "./components/StatsBar/StatsBar";
 import RentChart from "./components/RentChart";
+import WelcomeModal from "./components/WelcomeModal";
 
 const RentMap = lazy(() => import("./components/RentMap"));
 
@@ -44,11 +45,18 @@ function MapFallback() {
   );
 }
 
+function hasUrlFilters(): boolean {
+  const p = new URLSearchParams(window.location.search);
+  return ["city", "neighborhood", "priceMin", "priceMax", "roomsMin", "roomsMax"].some(k => p.has(k));
+}
+
 export default function App() {
-  const { loadFromUrl, city, neighborhood, roomsMin, roomsMax, priceMin, priceMax,
+  const { loadFromUrl, setCity, setNeighborhood, setPriceMax,
+          city, neighborhood, roomsMin, roomsMax, priceMin, priceMax,
           hasParking, hasBalcony, petsAllowed, furnished, sources } = useFilterStore();
   const [activeTab, setActiveTabState] = useState<Tab>(readTabFromUrl);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(() => !hasUrlFilters());
 
   // Count active filters for the badge
   const activeFilterCount = [
@@ -59,6 +67,13 @@ export default function App() {
   useEffect(() => {
     loadFromUrl();
   }, []);
+
+  const handleWelcomeDone = (filters: { city: string | null; neighborhood: string | null; priceMax: number | null }) => {
+    if (filters.city) setCity(filters.city);
+    if (filters.neighborhood) setNeighborhood(filters.neighborhood);
+    if (filters.priceMax) setPriceMax(filters.priceMax);
+    setShowWelcome(false);
+  };
 
   const setActiveTab = (tab: Tab) => {
     setActiveTabState(tab);
@@ -74,6 +89,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ background: "#0E1117" }}>
+      {showWelcome && <WelcomeModal onDone={handleWelcomeDone} />}
       <Header />
 
       {/* Tab navigation */}
